@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 
+import com.app.api.Crawling;
 import com.app.api.FileConverter;
 import com.app.api.MailSender;
 import com.app.dto.UserDTO;
@@ -52,24 +53,51 @@ public class MainController implements Initializable {
 	private TextField tfSecondKeyword;
 
 	private MailSender sender;
+	
+	// java FX Thread에 넣기 위해 사용
 	private Alert sendingAlert;
 	
 	@FXML
 	private void handleAddClick() {
-		Integer nextNum = table.getItems().size() + 1;
-		UserDTO user = new UserDTO(nextNum, tfEmail.getText(), tfFirstKeyword.getText(), tfSecondKeyword.getText());
-		table.getItems().add(user);
-		Platform.runLater(() -> {
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Crawling.getContents("사이다");
+			};
+		}).start();
+		
+		String email = tfEmail.getText().trim();
+		String firstKeyword = tfFirstKeyword.getText().trim();
+		String secondKeyword = tfSecondKeyword.getText().trim();
+		
+		if (email.equals("") && firstKeyword.equals("")) {
+			String title = "입력 경고";
+			String header = "빈 칸이 존재합니다.";
+			String content = "이메일과 키워드1은 필수 입력란 입니다.";
+			
+			Alert alert = createAlert(AlertType.WARNING, title, header, content);
+			alert.show();
+			
+		} else {
+			Integer nextNum = table.getItems().size() + 1;
+			UserDTO user = new UserDTO(nextNum, email, firstKeyword, secondKeyword);
+			table.getItems().add(user);
 			tfEmail.clear();
 			tfFirstKeyword.clear();
 			tfSecondKeyword.clear();
 			tfEmail.requestFocus();
-		});
+		}
 	}
 
 	@FXML
 	private void handleSelectAllClick() {
 		table.getSelectionModel().selectAll();
+	}
+	
+	@FXML
+	private void handleDeselectClick() {
+		table.getSelectionModel().clearSelection();
 	}
 
 	@FXML
@@ -81,101 +109,115 @@ public class MainController implements Initializable {
 			table.getSelectionModel().clearSelection();
 
 		} else {
-			Alert alert = new Alert(AlertType.WARNING);
-			alert.setTitle("No Selection");
-			alert.setHeaderText("No User Selected");
-			alert.setContentText("Please select a User in the table.");
-			alert.showAndWait();
+			String title = "삭제 경고";
+			String header = "선택된 항목이 없습니다.";
+			String content = "테이블에서 항목을 선택 후 삭제 버튼을 클릭해 주세요";
+			
+			Alert alert = createAlert(AlertType.WARNING, title, header, content);
+			alert.show();
 		}
 
 	}
 
 	@FXML
 	private void handleSendMailClick() {
-		Thread parentThread = new Thread(new Runnable() {
+		
+		if (table.getItems().size() == 0) {
+			String title = "메일 전송 경고";
+			String header = "전송할 메일이 없습니다.";
+			String content = "항목을 먼저 입력 후, 메일 전송을 클릭해 주세요.";
+			
+			Alert alert = createAlert(AlertType.WARNING, title, header, content);
+			alert.show();
+			
+		} else {
+			new Thread(new Runnable() {
 
-			@Override
-			public void run() {
-				
-				Platform.runLater(() -> {
-					Alert sending = new Alert(AlertType.WARNING);
-					setSendingAlert(sending);
+				@Override
+				public void run() {
 					
-					sending.setTitle("전송 중");
-					sending.setHeaderText("메일 전송 중");
-					sending.setContentText("메일 전송 준비 중입니다. 종료하지 말아주세요.");
-					sending.initModality(Modality.NONE);
-					sending.show();
-				});
+					Platform.runLater(() -> {
+						String title = "전송 중";
+						String header = "메일 전송 중";
+						String content = "메일 전송 준비 중입니다. 종료하지 말아주세요.";
+						
+						Alert sending = createAlert(AlertType.WARNING, title, header, content);
+						sending.initModality(Modality.NONE);
+						sending.show();
+						
+						setSendingAlert(sending);
+					});
 
-				Thread t = new Thread(new Runnable() {
+					Thread childThread = new Thread(new Runnable() {
 
-					@Override
-					public void run() {
-						try {
-							ObservableList<UserDTO> users = table.getItems();
-							// 로그인
-							sender.connect();
-							
-							for (int i = 0; i < users.size(); i++) {
-								sender.sendMessage(users.get(i));
+						@Override
+						public void run() {
+							try {
+								ObservableList<UserDTO> users = table.getItems();
+								// 로그인
+								sender.connect();
 								
-								int now = i + 1;
-								Platform.runLater(() -> {
-									getSendingAlert().setContentText(now + " / " + users.size() + " 메일 전송 완료");
-								});
-							}
-							
-						} catch (Exception e) {
-							
-							Platform.runLater(() -> {
-								
-								if (getSendingAlert().isShowing()) {
-									getSendingAlert().close();
+								for (int i = 0; i < users.size(); i++) {
+									sender.sendMessage(users.get(i));
+									
+									int now = i + 1;
+									Platform.runLater(() -> {
+										getSendingAlert().setContentText(now + " / " + users.size() + " 메일 전송 완료");
+									});
 								}
 								
-								Alert alert = new Alert(AlertType.ERROR);
-								alert.setTitle("전송 실패");
-								alert.setHeaderText("메일 전송 실패");
-								alert.setContentText("전송 중 에러 발생\n" + e.toString());
-								alert.show();
-							});
-							
-						} finally {
-							//로그아웃
-							try {
-								sender.disconnect();
-							} catch (MessagingException e) {
-								e.printStackTrace();
+							} catch (Exception e) {
+								
+								Platform.runLater(() -> {
+									
+									if (getSendingAlert().isShowing()) {
+										getSendingAlert().close();
+									}
+									
+									String title = "전송 실패";
+									String header = "메일 전송 실패";
+									String content = "전송 중 에러 발생\n" + e.toString();
+									
+									Alert alert = createAlert(AlertType.ERROR, title, header, content);
+									alert.show();
+								});
+								
+							} finally {
+								//로그아웃
+								try {
+									sender.disconnect();
+								} catch (MessagingException e) {
+									e.printStackTrace();
+								}
 							}
 						}
-					}
-				});
-				
-				t.start();
-				
-				try {
-					t.join();
+					});
 					
-				} catch (InterruptedException e) {/* Thread Error */}
-				
-				Platform.runLater(() -> {
+					childThread.start();
 					
-					if (getSendingAlert().isShowing()) {
-						getSendingAlert().close();
-					}
+					try {
+						childThread.join();
+						
+					} catch (InterruptedException e) {/* Thread Error */}
 					
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("전송 완료");
-					alert.setHeaderText("메일 전송 완료");
-					alert.setContentText(table.getItems().size() + "건 메일 전송");
-					alert.show();
-				});
+					Platform.runLater(() -> {
+						
+						if (getSendingAlert().isShowing()) {
+							getSendingAlert().close();
+						}
+						
+						String title = "전송 완료";
+						String header = "메일 전송 완료";
+						String content = table.getItems().size() + "건 메일 전송";
+						
+						Alert alert = createAlert(AlertType.INFORMATION, title, header, content);
+						alert.show();
+					});
 
-			}
-		});
+				}
+			}).start();
+		}
 
-		parentThread.start();
 	}
 
 	@FXML
@@ -186,8 +228,22 @@ public class MainController implements Initializable {
 		Node source = (Node) event.getSource();
 
 		File file = fileChooser.showOpenDialog(source.getScene().getWindow());
+		
+		if (file == null) return;
+		
+		String title = "파일 로드";
+		String header = "파일 로드 중 입니다.";
+		String content = file.getName() + " 파일 로드 중 입니다. 잠시만 기다려 주세요.";
+		
+		Alert loadingAlert = createAlert(AlertType.INFORMATION, title, header, content);
+		loadingAlert.show();
 
 		table.setItems(FileConverter.loadFile(file));
+		
+		if (loadingAlert.isShowing()) {
+			loadingAlert.close();
+		}
+		
 	}
 
 	@FXML
@@ -203,7 +259,20 @@ public class MainController implements Initializable {
 
 		File file = fileChooser.showSaveDialog(source.getScene().getWindow());
 
+		if (file == null) return;
+		
+		String title = "파일 저장";
+		String header = "파일 저장 중 입니다.";
+		String content = file.getName() + " 파일 저장 중 입니다. 잠시만 기다려 주세요.";
+		
+		Alert loadingAlert = createAlert(AlertType.INFORMATION, title, header, content);
+		loadingAlert.show();
+		
 		FileConverter.saveFile(file, table.getItems());
+		
+		if (loadingAlert.isShowing()) {
+			loadingAlert.close();
+		}
 
 	}
 
@@ -223,7 +292,16 @@ public class MainController implements Initializable {
 		colSecondKeyword.setCellValueFactory(new PropertyValueFactory<>("secondKeyword"));
 		Platform.runLater(() -> root.requestFocus());
 	}
+	
+	private Alert createAlert(AlertType type, String title, String header, String content) {
+		Alert alert = new Alert(type);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		return alert;
+	}
 
+	// getter, setter
 	public Alert getSendingAlert() {
 		return sendingAlert;
 	}

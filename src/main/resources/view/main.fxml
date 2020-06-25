@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?language javascript?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -26,32 +28,98 @@
                         <Button fx:id="btnAdd" mnemonicParsing="false" onAction="#handleAddClick" prefHeight="30.0" prefWidth="55.0" text="추가" />
                      </children>
                   </HBox>
-                  <BorderPane prefHeight="79.0" prefWidth="476.0">
+                  <BorderPane prefHeight="89.0" prefWidth="476.0">
                      <top>
                         <Separator prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </top>
                      <center>
-                        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                           <left>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <Button fx:id="btnSelectAll" mnemonicParsing="false" onAction="#handleSelectAllClick" prefHeight="30.0" text="전체 선택" />
-                                    <Button fx:id="btnRemove" mnemonicParsing="false" onAction="#handleRemoveClick" prefHeight="30.0" text="삭제" />
-                                 </children>
-                              </HBox>
-                           </left>
-                           <right>
-                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
-                                 <children>
-                                    <Button fx:id="btnLoad" mnemonicParsing="false" onAction="#handleLoadClick" prefHeight="30.0" text="불러오기" />
-                                    <Button fx:id="btnSave" mnemonicParsing="false" onAction="#handleSaveClick" prefHeight="30.0" text="저장" />
-                                    <Button fx:id="btnSendMail" mnemonicParsing="false" onAction="#handleSendMailClick" prefHeight="30.0" text="메일 전송" />
-                                 </children>
-                              </HBox>
-                           </right>
+                        <BorderPane prefHeight="86.0" prefWidth="476.0" BorderPane.alignment="CENTER">
                            <top>
-                              <Pane prefHeight="14.0" prefWidth="476.0" BorderPane.alignment="CENTER" />
+                              <Pane prefHeight="6.0" prefWidth="476.0" BorderPane.alignment="CENTER" />
                            </top>
+                           <center>
+                              <HBox prefHeight="62.0" prefWidth="90.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <BorderPane prefHeight="80.0" prefWidth="180.0">
+                                       <top>
+                                          <Label alignment="CENTER" prefWidth="80.0" text="리     스      트" BorderPane.alignment="CENTER" />
+                                       </top>
+                                       <center>
+                                          <HBox alignment="CENTER" prefHeight="65.0" spacing="10.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                                   <children>
+                                                      <Button fx:id="btnSelectAll" mnemonicParsing="false" onAction="#handleSelectAllClick" prefWidth="70.0" text="전체 선택" />
+                                                      <Button fx:id="btnDeselect" mnemonicParsing="false" onAction="#handleDeselectClick" prefWidth="70.0" text="전체 해제" />
+                                                   </children>
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                   <children>
+                                                      <Button fx:id="btnRemove" mnemonicParsing="false" onAction="#handleRemoveClick" prefWidth="70.0" text="삭제" />
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                             <BorderPane.margin>
+                                                <Insets />
+                                             </BorderPane.margin>
+                                             <padding>
+                                                <Insets top="5.0" />
+                                             </padding>
+                                          </HBox>
+                                       </center>
+                                    </BorderPane>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <BorderPane prefHeight="80.0" prefWidth="180.0">
+                                       <top>
+                                          <Label alignment="CENTER" prefWidth="80.0" text="파      일" BorderPane.alignment="CENTER" />
+                                       </top>
+                                       <center>
+                                          <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                                   <children>
+                                                      <Button fx:id="btnHtml" mnemonicParsing="false" onAction="#handleHtmlClick" prefWidth="70.0" text="HTML" />
+                                                   </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                                   <children>
+                                                      <Button fx:id="btnLoad" mnemonicParsing="false" onAction="#handleLoadClick" prefWidth="70.0" text="불러오기" />
+                                                      <Button fx:id="btnSave" mnemonicParsing="false" onAction="#handleSaveClick" prefWidth="70.0" text="저장" />
+                                                   </children>
+                                                   <HBox.margin>
+                                                      <Insets />
+                                                   </HBox.margin>
+                                                </VBox>
+                                             </children>
+                                             <padding>
+                                                <Insets top="5.0" />
+                                             </padding>
+                                          </HBox>
+                                       </center>
+                                    </BorderPane>
+                                    <Separator orientation="VERTICAL" prefHeight="200.0" />
+                                    <BorderPane prefHeight="62.0" prefWidth="118.0">
+                                       <top>
+                                          <Label alignment="CENTER" prefWidth="80.0" text="메      일" BorderPane.alignment="CENTER" />
+                                       </top>
+                                       <center>
+                                          <VBox alignment="CENTER" prefHeight="64.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
+                                             <children>
+                                                <Button fx:id="btnPreview" mnemonicParsing="false" onAction="#handlePreviewClick" prefWidth="70.0" text="미리보기" />
+                                                <Button fx:id="btnSendMail" mnemonicParsing="false" onAction="#handleSendMailClick" prefWidth="70.0" text="메일 전송" />
+                                             </children>
+                                             <padding>
+                                                <Insets top="5.0" />
+                                             </padding>
+                                          </VBox>
+                                       </center>
+                                    </BorderPane>
+                                 </children>
+                              </HBox>
+                           </center>
                         </BorderPane>
                      </center>
                   </BorderPane>
