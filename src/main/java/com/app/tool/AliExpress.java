@@ -1,7 +1,6 @@
-package com.app.api;
+package com.app.tool;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -64,13 +63,12 @@ public class AliExpress {
 		return null;
 	}
 
-	public String linkGenerate(String keyword) throws ApiException, ParseException, UnsupportedEncodingException {
+	public String linkGenerate(String link) throws ApiException, ParseException, UnsupportedEncodingException {
 		TaobaoClient client = new DefaultTaobaoClient(URL, APP_KEY, SECRET);
 		AliexpressAffiliateLinkGenerateRequest req = new AliexpressAffiliateLinkGenerateRequest();
 		req.setPromotionLinkType(0L);
-		keyword = URLEncoder.encode(keyword, "UTF-8");
-
-		req.setSourceValues("https://ko.aliexpress.com/af/" + keyword + ".html?trafficChannel=af&d=y&ltype=affiliate&SortType=total_tranpro_desc&groupsort=1&CatId=0&page=1");
+		req.setSourceValues(link);
+		//req.setSourceValues("https://ko.aliexpress.com/af/" + keyword + ".html?trafficChannel=af&d=y&ltype=affiliate&SortType=total_tranpro_desc&groupsort=1&CatId=0&page=1");
 		req.setTrackingId("naver");
 
 		AliexpressAffiliateLinkGenerateResponse rsp = client.execute(req);
@@ -81,10 +79,10 @@ public class AliExpress {
 
 		String resp_code = String.valueOf(resp_result.get("resp_code"));
 		if (resp_code.equals("200")) {
-			String link = (String) ((JSONObject) ((JSONArray) ((JSONObject) ((JSONObject) resp_result.get("result"))
+			String promotionLink = (String) ((JSONObject) ((JSONArray) ((JSONObject) ((JSONObject) resp_result.get("result"))
 					.get("promotion_links")).get("promotion_link")).get(0)).get("promotion_link");
 			
-			return link;
+			return promotionLink;
 		}
 
 		return null;
