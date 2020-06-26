@@ -8,10 +8,9 @@ import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
 
-import com.app.api.Crawling;
-import com.app.api.FileConverter;
-import com.app.api.MailSender;
 import com.app.dto.UserDTO;
+import com.app.tool.FileConverter;
+import com.app.tool.MailSender;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -59,13 +58,6 @@ public class MainController implements Initializable {
 	
 	@FXML
 	private void handleAddClick() {
-		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Crawling.getContents("사이다");
-			};
-		}).start();
 		
 		String email = tfEmail.getText().trim();
 		String firstKeyword = tfFirstKeyword.getText().trim();
@@ -131,6 +123,8 @@ public class MainController implements Initializable {
 			alert.show();
 			
 		} else {
+			long start = System.currentTimeMillis();
+			
 			new Thread(new Runnable() {
 
 				@Override
@@ -213,6 +207,9 @@ public class MainController implements Initializable {
 						Alert alert = createAlert(AlertType.INFORMATION, title, header, content);
 						alert.show();
 					});
+					
+					long end = System.currentTimeMillis();
+					System.out.println("소요시간: " + (end - start));
 
 				}
 			}).start();
