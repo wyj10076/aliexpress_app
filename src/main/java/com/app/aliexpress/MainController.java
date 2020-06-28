@@ -4,7 +4,6 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -96,9 +95,42 @@ public class MainController {
 	
 	@FXML
 	private void initialize() {
-		mailCheck(Config.getEmail(), Config.getPassword());
+		String content = "환경설정 파일을 불러오는 중 입니다.";
+		Alert alert = getDoingAlert();
+		alert.setContentText(content);
+		alert.show();
+		
+		File config = new File("config");
+		try {
+			if (!config.exists()) {
+				Config.createConfigFile();
+			}
+			
+			Config.loadConfig();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		content = "메일 및 파일을 검사 중 입니다.";
+		alert.setContentText(content);
+		
+		if (!alert.isShowing()) {
+			alert.show();
+		}
+		
+		mailCheck(Config.PLATFORM, Config.EMAIL, Config.PASSWORD);
 		fileCheck();
 
+		Platform.runLater(() -> {
+			Alert doingAlert = getDoingAlert();
+			
+			if (doingAlert.isShowing()) {
+				doingAlert.close();
+			}
+			setDoingAlert(null);
+		});
+		
 		if (!isExistEmail()) {
 			btnSendMail.setDisable(true);
 		}
@@ -268,7 +300,7 @@ public class MainController {
 				});
 				
 				try {
-					String tmpPath = Config.getTempFilePath();
+					String tmpPath = Config.PREVIEW_DIR_PATH;
 					File dir = new File(tmpPath);
 					
 					if (!dir.exists()) {
@@ -281,28 +313,34 @@ public class MainController {
 					// Delete tmp file
 					tmpFile.deleteOnExit();
 					
-					OutputStream output = new FileOutputStream(tmpFile);
-					byte[] by=str.toString().getBytes();
+					FileOutputStream fos = new FileOutputStream(tmpFile);
 					
-					output.write(by);
-					output.close();
+					fos.write(str.toString().getBytes());
+					fos.close();
 					
 					Platform.runLater(() -> {
 						
-						String content = tmpFile.getPath() + " 생성 완료";
-						
-						Alert alert = getDoingAlert();
-						alert.setContentText(content);
-						
-						if (alert.isShowing()) {
-							alert.show();
+						String content;
+						try {
+							content = tmpFile.getCanonicalPath() + " 생성 완료";
+							
+							Alert alert = getDoingAlert();
+							alert.setContentText(content);
+							
+							if (alert.isShowing()) {
+								alert.show();
+							}
+							
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
 						}
 						
 						// doingAlert 정리
 						setDoingAlert(null);
 					});
 					
-					Desktop.getDesktop().browse(new URI("file:///" + tmpFile.getPath().replaceAll("\\\\", "/")));
+					Desktop.getDesktop().browse(new URI("file:///" + tmpFile.getCanonicalPath().replaceAll("\\\\", "/")));
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -675,7 +713,7 @@ public class MainController {
 			int contentCount = props.size();
 
 			for (Properties prop : props) {
-				if (processedProps.size() >= 10) {
+				if (processedProps.size() >= Config.ITEM_COUNT) {
 					break;
 				}
 				
@@ -731,22 +769,23 @@ public class MainController {
 		return getModalStage();
 	}
 	
-	private void mailCheck(String email, String password) {
+	private void mailCheck(String platform, String email, String password) {
 		try {
-			sender = new MailSender(email, password);
+			sender = new MailSender(platform, email, password);
 			setExistEmail(true);
 			
 		} catch (Exception e) {
-			Alert alert = createErrorAlert("이메일 계정을 확인해 주세요.");
+			if (getDoingAlert().isShowing()) getDoingAlert().close();
+			
+			Alert alert = createErrorAlert("설정된 이메일을 확인해 주세요.");
 			setExistEmail(false);
 			alert.showAndWait();
-			return;
 		}
 	}
 	
 	private void fileCheck() {
-		File driver = new File(Config.getDriverPath());
-		File image = new File(Config.getImagePath());
+		File driver = new File(Config.WEB_DRIVER_PATH);
+		File image = new File(Config.NO_RESULT_IMAGE_PATH);
 		
 		String content = "파일이 존재하지 않습니다.\n";
 		

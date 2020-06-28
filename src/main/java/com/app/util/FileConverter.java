@@ -75,7 +75,6 @@ public class FileConverter {
 			}
 		}
 		
-		System.out.println("저장완료");
 	}
 	
 	public static ObservableList<UserDTO> loadFile(File file) throws Exception {
