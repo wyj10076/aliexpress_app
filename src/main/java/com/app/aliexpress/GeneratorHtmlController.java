@@ -65,12 +65,10 @@ public class GeneratorHtmlController {
 		
 		if (keyword.equals("")) {
 			Platform.runLater(() -> {
-				String header = "키워드 미입력";
 				String content = "키워드 입력 후, 생성 버튼을 클릭해 주세요.";
 				
 				Alert alert = getDoingAlert();
 				alert.setAlertType(AlertType.ERROR);
-				alert.setHeaderText(header);
 				alert.setContentText(content);
 				alert.show();
 				
@@ -84,12 +82,11 @@ public class GeneratorHtmlController {
 		
 		Platform.runLater(() -> {
 			
-			String header = "크롤링 중";
 			String content = "크롤링 중 입니다. 잠시만 기다려 주세요.";
 			
 			Alert alert = getDoingAlert();
-			alert.setHeaderText(header);
 			alert.setContentText(content);
+			
 			alert.show();
 			
 		});
@@ -105,12 +102,9 @@ public class GeneratorHtmlController {
 
 				// 크롤링 완료 후 alert 변경
 				Platform.runLater(() -> {
-
-					String header = "링크 변환 중";
 					String content = "링크 변환 준비 중입니다. 잠시만 기다려 주세요.";
 
 					Alert alert = getDoingAlert();
-					alert.setHeaderText(header);
 					alert.setContentText(content);
 
 					if (!alert.isShowing()) {
@@ -170,12 +164,9 @@ public class GeneratorHtmlController {
 				
 				try {
 					Platform.runLater(() -> {
-
-						String header = "HTML 생성 중";
 						String content = "HTML 생성 중 입니다. 잠시만 기다려 주세요.";
 
 						Alert alert = getDoingAlert();
-						alert.setHeaderText(header);
 						alert.setContentText(content);
 						
 						if (!alert.isShowing()) {
@@ -186,12 +177,9 @@ public class GeneratorHtmlController {
 					String html = (String) Editor.createHtml(EditorType.HTML, keyword, processedData).get("content");
 					
 					Platform.runLater(() -> {
-
-						String header = "HTML 생성 완료";
 						String content = "HTML 생성을 완료하였습니다.";
 
 						Alert alert = getDoingAlert();
-						alert.setHeaderText(header);
 						alert.setContentText(content);
 						
 						if (!alert.isShowing()) {
@@ -233,6 +221,7 @@ public class GeneratorHtmlController {
 		if (doingAlert == null) {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Html Generator");
+			alert.setHeaderText(null);
 			alert.initModality(Modality.NONE);
 
 			setDoingAlert(alert);

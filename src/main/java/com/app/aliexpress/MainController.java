@@ -243,9 +243,10 @@ public class MainController {
 
 			@Override
 			public void run() {
-				Map<String, List<Properties>> crawlingData = generateData();
+				Map<String, List<Properties>> processedData = generateData();
+				
 				StringBuilder str = new StringBuilder();
-				crawlingData.forEach((key, value) -> {
+				processedData.forEach((key, value) -> {
 					try {
 						str.append(Editor.createHtml(EditorType.PREVIEW, key, crawlingData).get("content"));
 						str.append("<br/><br/>");
@@ -335,68 +336,7 @@ public class MainController {
 			@Override
 			public void run() {
 
-				Map<String, List<Properties>> crawlingData = generateData();
-
-				// 크롤링 완료 후 alert 변경
-				Platform.runLater(() -> {
-
-					String content = "링크 변환 준비 중입니다.";
-
-					Alert alert = getDoingAlert();
-					alert.setContentText(content);
-
-					if (!alert.isShowing()) {
-						alert.show();
-					}
-				});
-
-				// promotion_link로 변환
-				// forEach 도는 중에 map을 변경하면 안될 것 같아서 새로 담을 map을 만들었음
-				Map<String, List<Properties>> processedData = new HashMap<>();
-
-				// 보여주기 위한 총 변환해야할 link 개수
-				int keywordCount = crawlingData.size();
-				setNowCount(0); // 초기값
-
-				crawlingData.forEach((key, value) -> {
-					List<Properties> processedProps = new ArrayList<>();
-					List<Properties> props = value;
-					int contentCount = props.size();
-
-					for (Properties prop : props) {
-						if (processedProps.size() >= 10) {
-							break;
-						}
-						
-						Platform.runLater(() -> {
-
-							String content = getNowCount() + " / " + (keywordCount * contentCount) + " 변환 완료";
-
-							Alert alert = getDoingAlert();
-							alert.setContentText(content);
-						});
-
-						String link = prop.getProperty("link");
-						
-						try {
-							link = AliExpress.linkGenerate(LinkType.PRODUCT, link);
-							
-							// Thread 안에서 지역 변수는 final 값이기 때문에 class의 멤버 필드를 사용
-							setNowCount(getNowCount() + 1);
-							
-							if (link == null) continue;
-							
-							prop.put("link", link);
-							processedProps.add(prop);
-
-						} catch (Exception e) {
-							e.printStackTrace();
-							// 생성 실패한 링크
-						}
-					}
-
-					processedData.put(key, processedProps);
-				});
+				Map<String, List<Properties>> processedData = generateData();
 
 				Platform.runLater(() -> {
 
@@ -607,7 +547,7 @@ public class MainController {
 	
 	private Map<String, List<Properties>> generateData() {
 		if (getCrawlingData() == null) {
-			setCrawlingData(startCrawling());
+			setCrawlingData(convertLink(startCrawling()));
 		}
 		
 		return getCrawlingData();
@@ -706,6 +646,70 @@ public class MainController {
 		}
 		
 		return crawlingData;
+	}
+	
+	private Map<String, List<Properties>> convertLink(Map<String, List<Properties>> crawlingData) {
+		// 크롤링 완료 후 alert 변경
+		Platform.runLater(() -> {
+
+			String content = "링크 변환 준비 중입니다.";
+
+			Alert alert = getDoingAlert();
+			alert.setContentText(content);
+
+			if (!alert.isShowing()) {
+				alert.show();
+			}
+		});
+		
+		// forEach 도는 중에 map을 변경하면 안될 것 같아서 새로 담을 map을 만들었음
+		Map<String, List<Properties>> processedData = new HashMap<>();
+
+		// 보여주기 위한 총 변환해야할 link 개수
+		int keywordCount = crawlingData.size();
+		setNowCount(0); // 초기값
+
+		crawlingData.forEach((key, value) -> {
+			List<Properties> processedProps = new ArrayList<>();
+			List<Properties> props = value;
+			int contentCount = props.size();
+
+			for (Properties prop : props) {
+				if (processedProps.size() >= 10) {
+					break;
+				}
+				
+				Platform.runLater(() -> {
+
+					String content = getNowCount() + " / " + (keywordCount * contentCount) + " 변환 완료";
+
+					Alert alert = getDoingAlert();
+					alert.setContentText(content);
+				});
+
+				String link = prop.getProperty("link");
+				
+				try {
+					link = AliExpress.linkGenerate(LinkType.PRODUCT, link);
+					
+					// Thread 안에서 지역 변수는 final 값이기 때문에 class의 멤버 필드를 사용
+					setNowCount(getNowCount() + 1);
+					
+					if (link == null) continue;
+					
+					prop.put("link", link);
+					processedProps.add(prop);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					// 생성 실패한 링크
+				}
+			}
+
+			processedData.put(key, processedProps);
+		});
+		
+		return processedData;
 	}
 	
 	private Stage generateStage(ActionEvent event) throws IOException {
