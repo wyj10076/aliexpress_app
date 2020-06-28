@@ -25,13 +25,18 @@ public class MailSender {
 	public MailSender() {
 	}
 
-	public MailSender(String email, String password) throws Exception {
+	public MailSender(String platform, String email, String password) throws Exception {
 		Properties mailProps = new Properties();
 		
 		// Step1
 		this.email = email;
 		this.password = password;
 		
+		if (platform.equals("gmail")) {
+			mailProps.put("mail.smtp.host", "smtp.gmail.com");
+		} else if (platform.equals("naver")) {
+			mailProps.put("mail.smtp.host", "smtp.naver.com");
+		}
 		mailProps.put("mail.smtp.port", "587");
 		mailProps.put("mail.smtp.auth", "true");
 		mailProps.put("mail.smtp.starttls.enable", "true");
@@ -51,7 +56,7 @@ public class MailSender {
 	
 	public void connect() throws Exception {
 		// Enter your correct gmail UserID and Password
-		this.transport.connect("smtp.gmail.com", this.email, this.password);
+		this.transport.connect(this.email, this.password);
 	}
 	
 	public void disconnect() throws Exception {

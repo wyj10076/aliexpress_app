@@ -25,7 +25,7 @@ public class Crawling {
 	public Crawling(Integer index) {
 		this.index = index;
 
-		System.setProperty("webdriver.chrome.driver", Config.getDriverPath());
+		System.setProperty("webdriver.chrome.driver", Config.WEB_DRIVER_PATH);
 
 		ChromeOptions options = new ChromeOptions();
 
@@ -80,20 +80,20 @@ public class Crawling {
 			int scrollY = 1000;
 			int size = 0;
 			
-			// 필요한 content 개수
-			final int CONTENT_COUNT = 20;
+			// 필요한 content 개수 = 키워드당 아이템 개수 * 2(링크 변환이 안될 수도 있기 때문에 여유분 확보)
+			int contentCount = Config.ITEM_COUNT * 2;
 			do {
 				contents = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector("li.list-item")));
 				
 				if (contents.size() > 0) {
 					
 					size = contents.size();
-					if (size < CONTENT_COUNT) {
+					if (size < contentCount) {
 						js.executeScript("window.scrollTo(0, " + scrollY + ");");
 						scrollY += 1000;
 						
 					} else {
-						for (int i = 0; i < CONTENT_COUNT; i++) {
+						for (int i = 0; i < contentCount; i++) {
 							WebElement content = contents.get(i);
 							
 							Properties prop = new Properties();
@@ -129,7 +129,7 @@ public class Crawling {
 					}
 				}
 				
-			} while (size < CONTENT_COUNT);
+			} while (size < contentCount);
 				
 		} catch (Exception e) {
 			

@@ -6,7 +6,6 @@ import java.util.Queue;
 
 public class WebDriverPool {
 
-	private static final int MAX_RESOURCE = 2;
 	private Hashtable<Integer, Crawling> pool;
 	private Queue<Integer> queue;
 	
@@ -18,7 +17,7 @@ public class WebDriverPool {
 		pool = new Hashtable<Integer, Crawling>();
 		queue = new LinkedList<>();
 		
-		for (int i = 0; i < MAX_RESOURCE; i++) {
+		for (int i = 0; i < Config.WEB_DRIVER_COUNT; i++) {
 			Integer index = new Integer(i);
 			pool.put(index, new Crawling(index));
 			queue.add(index);

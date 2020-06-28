@@ -11,18 +11,8 @@ import com.taobao.api.response.AliexpressAffiliateLinkGenerateResponse;
 
 public class AliExpress {
 
-	public static final String URL;
-	public static final String APP_KEY;
-	public static final String SECRET;
-
-	static {
-		URL = "http://api.taobao.com/router/rest";
-		APP_KEY = "30259406";
-		SECRET = "606f6aa3e35e217ea1ce97c8d9c0cb81";
-	}
-
 	public static String linkGenerate(LinkType type, String link) throws Exception {
-		TaobaoClient client = new DefaultTaobaoClient(URL, APP_KEY, SECRET);
+		TaobaoClient client = new DefaultTaobaoClient(Config.ALI_URL, Config.ALI_APP_KEY, Config.ALI_SECRET);
 		AliexpressAffiliateLinkGenerateRequest req = new AliexpressAffiliateLinkGenerateRequest();
 		
 		String promotionLink = null;

@@ -1,5 +1,6 @@
 package com.app.util;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +59,13 @@ public class Editor {
 				messageBodyPart = new MimeBodyPart();
 				
 				// 이미지 첨부
-	            DataSource fds = new FileDataSource(Config.getImagePath());
+	            DataSource fds = new FileDataSource(Config.NO_RESULT_IMAGE_PATH);
 	        
 	        	messageBodyPart.setDataHandler(new DataHandler(fds));
 				messageBodyPart.setHeader("Content-ID","<no-result>");
 				
 			} else if (type == EditorType.PREVIEW) {
-				content += "<img src=\"" + Config.getImagePath() + "\"/>\n";
+				content += "<img src=\"" + new File(Config.NO_RESULT_IMAGE_PATH).getCanonicalPath() + "\"/>\n";
 				
 			} else if (type == EditorType.HTML) {
 				content += "<div>검색 결과가 없습니다.</div>\n";
