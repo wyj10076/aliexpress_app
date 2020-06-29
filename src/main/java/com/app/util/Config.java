@@ -59,6 +59,7 @@ public class Config {
 					+ "\n"
 					+ "# 검색 결과 없을 시에 보낼 이이미지 경로\n"
 					+ "NO_RESULT_IMAGE_PATH = images/no_result.png\n"
+					+ "\n"
 					+ "# 미리보기 임시 파일 폴더\n"
 					+ "PREVIEW_DIR_PATH  = preview\n"
 					+ "#------------------------------------------------------\n"
