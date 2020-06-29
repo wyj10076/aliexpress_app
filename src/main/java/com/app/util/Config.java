@@ -33,20 +33,21 @@ public class Config {
 		Properties prop = new Properties();
 		prop.load(config);
 		
-		NO_RESULT_IMAGE_PATH = prop.getProperty("NO_RESULT_IMAGE_PATH");
-		WEB_DRIVER_PATH = prop.getProperty("WEB_DRIVER_PATH");
-		PREVIEW_DIR_PATH  = prop.getProperty("PREVIEW_DIR_PATH ");
+		NO_RESULT_IMAGE_PATH = prop.getProperty("NO_RESULT_IMAGE_PATH").trim();
+		WEB_DRIVER_PATH = prop.getProperty("WEB_DRIVER_PATH").trim();
+		PREVIEW_DIR_PATH  = prop.getProperty("PREVIEW_DIR_PATH").trim();
 		
-		ALI_URL = prop.getProperty("ALI_URL");
-		ALI_APP_KEY = prop.getProperty("ALI_APP_KEY");
-		ALI_SECRET = prop.getProperty("ALI_SECRET");
+		ALI_URL = prop.getProperty("ALI_URL").trim();
+		ALI_APP_KEY = prop.getProperty("ALI_APP_KEY").trim();
+		ALI_SECRET = prop.getProperty("ALI_SECRET").trim();
 		
-		PLATFORM = prop.getProperty("PLATFORM");
-		EMAIL = prop.getProperty("EMAIL");
-		PASSWORD = prop.getProperty("PASSWORD");
+		PLATFORM = prop.getProperty("PLATFORM").trim();
+		EMAIL = prop.getProperty("EMAIL").trim();
+		PASSWORD = prop.getProperty("PASSWORD").trim();
 		
-		ITEM_COUNT = Integer.parseInt(prop.getProperty("ITEM_COUNT"));
-		WEB_DRIVER_COUNT = Integer.parseInt(prop.getProperty("WEB_DRIVER_COUNT"));
+		ITEM_COUNT = Integer.parseInt(prop.getProperty("ITEM_COUNT").trim());
+		WEB_DRIVER_COUNT = Integer.parseInt(prop.getProperty("WEB_DRIVER_COUNT").trim());
+		
 	}
 	
 	public static void createConfigFile() throws Exception {
@@ -71,6 +72,10 @@ public class Config {
 					+ "#------- Email\n"
 					+ "# PLATFORM = [naver OR gmail]\n"
 					+ "PLATFORM = gmail\n"
+					+ "\n"
+					+ "# 네이버는 아이디만, Gmail은 도메인 까지 입력\n"
+					+ "# 네이버 => EMAIL = userId\n"
+					+ "# Gmail => EMAIL = userId@gmail.com\n"
 					+ "EMAIL = email@gmail.com\n"
 					+ "PASSWORD = password\n"
 					+ "#------------------------------------------------------\n"
@@ -87,4 +92,5 @@ public class Config {
 		fos.write(config.getBytes());
 		fos.close();
 	}
+	
 }

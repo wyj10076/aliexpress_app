@@ -89,9 +89,11 @@ public class MainController {
 	// 변경사항 유무 체크
 	private boolean isChange;
 	// 메일 체크
-	private boolean isExistEmail;
+	private boolean isValidateEmail;
 	// 파일 유무 체크
 	private boolean hasFile;
+	// 앱키 체크
+	private boolean isValidateApp;
 	
 	@FXML
 	private void initialize() {
@@ -112,7 +114,7 @@ public class MainController {
 			e.printStackTrace();
 		}
 		
-		content = "메일 및 파일을 검사 중 입니다.";
+		content = "유효성 검사 중 입니다.";
 		alert.setContentText(content);
 		
 		if (!alert.isShowing()) {
@@ -121,6 +123,7 @@ public class MainController {
 		
 		mailCheck(Config.PLATFORM, Config.EMAIL, Config.PASSWORD);
 		fileCheck();
+		appCheck();
 
 		Platform.runLater(() -> {
 			Alert doingAlert = getDoingAlert();
@@ -131,10 +134,15 @@ public class MainController {
 			setDoingAlert(null);
 		});
 		
-		if (!isExistEmail()) {
+		if (!isValidateEmail()) {
 			btnSendMail.setDisable(true);
 		}
 		if (!isHasFile()) {
+			btnHtml.setDisable(true);
+			btnPreview.setDisable(true);
+			btnSendMail.setDisable(true);
+		}
+		if (!isValidateApp()) {
 			btnHtml.setDisable(true);
 			btnPreview.setDisable(true);
 			btnSendMail.setDisable(true);
@@ -772,13 +780,13 @@ public class MainController {
 	private void mailCheck(String platform, String email, String password) {
 		try {
 			sender = new MailSender(platform, email, password);
-			setExistEmail(true);
+			setValidateEmail(true);
 			
 		} catch (Exception e) {
 			if (getDoingAlert().isShowing()) getDoingAlert().close();
 			
 			Alert alert = createErrorAlert("설정된 이메일을 확인해 주세요.");
-			setExistEmail(false);
+			setValidateEmail(false);
 			alert.showAndWait();
 		}
 	}
@@ -801,12 +809,30 @@ public class MainController {
 			setHasFile(true);
 			
 		} else {
+			if (getDoingAlert().isShowing()) getDoingAlert().close();
+			
 			Alert alert = createErrorAlert(content);
 			setHasFile(false);
 			alert.showAndWait();
 			
 		}
 		
+	}
+	
+	private void appCheck() {
+		try {
+			AliExpress.linkGenerate(LinkType.PRODUCT, "https://www.aliexpress.com");
+			setValidateApp(true);
+			
+		} catch (Exception e) {
+			if (getDoingAlert().isShowing()) getDoingAlert().close();
+			
+			String content = "App 설정을 확인해 주세요.";
+			
+			Alert alert = createErrorAlert(content);
+			setValidateApp(false);
+			alert.showAndWait();
+		}
 	}
 	
 	// getter, setter
@@ -859,6 +885,14 @@ public class MainController {
 	public void setModalStage(Stage modalStage) {
 		this.modalStage = modalStage;
 	}
+	
+	public boolean isValidateEmail() {
+		return isValidateEmail;
+	}
+
+	public void setValidateEmail(boolean isValidateEmail) {
+		this.isValidateEmail = isValidateEmail;
+	}
 
 	public boolean isHasFile() {
 		return hasFile;
@@ -868,12 +902,12 @@ public class MainController {
 		this.hasFile = hasFile;
 	}
 
-	public boolean isExistEmail() {
-		return isExistEmail;
+	public boolean isValidateApp() {
+		return isValidateApp;
 	}
 
-	public void setExistEmail(boolean isExistEmail) {
-		this.isExistEmail = isExistEmail;
+	public void setValidateApp(boolean isValidateApp) {
+		this.isValidateApp = isValidateApp;
 	}
 
 }
