@@ -220,7 +220,7 @@ public class GeneratorHtmlController {
 
 		if (doingAlert == null) {
 			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Html Generator");
+			alert.setTitle("HTML 생성기");
 			alert.setHeaderText(null);
 			alert.initModality(Modality.NONE);
 
